@@ -1,0 +1,17 @@
+{
+  "name": "app-socket-io-express-react",
+  "version": "1.0.0",
+  "description": "Full-stack app with Express Socket.io and React",
+  "scripts": {
+    "dev": "concurrently --names \"SERVER,CLIENT\" --prefix-colors \"bgBlue.bold,bgMagenta.bold\" \"npm run server\" \"npm run client\"",
+    "server": "cd server && npx nodemon server.js",
+    "client": "cd frontend && npm run dev",
+    "install:all": "npm install && cd server && npm install && cd ../frontend && npm install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
