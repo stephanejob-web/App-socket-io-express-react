@@ -21,6 +21,7 @@ io.on('connection', (socket) => {
     console.log('✅ Nouveau client connecté:', socket.id)
 
     socket.on('setUsername', (username) => {
+
         //verifie l'unicite de lutilisateur
         if (usernames.includes(username)) {
             console.log(`❌ Nom refusé: ${username} (déjà pris)`)

@@ -1,72 +1,63 @@
-import {useEffect, useRef, useState} from 'react'
-import io from 'socket.io-client'
-import {ModalUser} from "./components/Modal.jsx";
+import { createContext, useContext, useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
+import Chat from './pages/Chat'
+import LearnReact from './pages/LearnReact'
+import Login from './pages/Login'
+import NotFound from './pages/NotFound'
+import Navbar from './components/Navbar'
+import PrivateRoute from './components/PrivateRoute'
+
+// Contexte d'authentification
+const AuthContext = createContext(null)
+
+export const useAuth = () => {
+    const context = useContext(AuthContext)
+    if (!context) {
+        throw new Error('useAuth doit être utilisé dans AuthProvider')
+    }
+    return context
+}
 
 function App() {
-    const socketRef = useRef(null)
-    const [user, setUser] = useState(null)
-    const [inputValue, setInputValue] = useState('')
-    const [error, setError] = useState('')
+    const [user, setUser] = useState({ username: 'TestUser', id: 1 })
+    const [token, setToken] = useState('mon-token-en-dur-123456')
 
-    useEffect(() => {
-        // Connecter le socket dès le début
-        const newSocket = io('http://localhost:3000')
-        socketRef.current = newSocket
+    const login = (userData, authToken) => {
+        setUser(userData)
+        setToken(authToken)
+    }
 
-        newSocket.on('connect', () => {
-            console.log('✅ Connecté au serveur Socket.IO')
-            console.log('ID de socket:', newSocket.id)
-        })
+    const logout = () => {
+        setUser(null)
+        setToken(null)
+    }
 
-        // Écouter si le nom est accepté
-        newSocket.on('usernameAccepted', (username) => {
-            console.log('✅ Nom accepté:', username)
-            setUser(username)
-            setError('')
-        })
-
-        // Écouter si le nom est refusé
-        newSocket.on('usernameRejected', (message) => {
-            console.log('❌ Nom refusé:', message)
-            setError(message)
-            setUser(null)
-        })
-
-        newSocket.on('disconnect', () => {
-            console.log('❌ Déconnecté du serveur')
-        })
-
-        return () => {
-            newSocket.close()
-        }
-    }, [])
-
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        if (inputValue.trim()) {
-            setError('')
-            // Envoyer le nom au serveur pour vérification
-            socketRef.current.emit('setUsername', inputValue.trim())
-        }
+    const authValue = {
+        user,
+        token,
+        login,
+        logout
     }
 
     return (
-        <div>
-            <ModalUser
-                open={!user}
-                handleClose={() => {}}
-                onSubmit={handleSubmit}
-                onChange={(e) => setInputValue(e.target.value)}
-                value={inputValue}
-                error={error}
-            />
-            {user && (
-                <div>
-                    <h1>Bienvenue {user}!</h1>
-                    <p>Chat en cours...</p>
-                </div>
-            )}
-        </div>
+        <AuthContext.Provider value={authValue}>
+            <Navbar />
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/learnreact" element={<LearnReact />} />
+                <Route
+                    path="/chat"
+                    element={
+                        <PrivateRoute>
+                            <Chat />
+                        </PrivateRoute>
+                    }
+                />
+                <Route path="*" element={<NotFound />} />
+            </Routes>
+        </AuthContext.Provider>
     )
 }
 
