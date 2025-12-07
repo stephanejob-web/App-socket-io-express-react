@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Container, Box, Typography, TextField, Button } from '@mui/material'
-import { useAuth } from '../App'
+import { useApp } from '../context/AppContext'
 
 function Login() {
     const [username, setUsername] = useState('')
-    const { login } = useAuth()
+    const { login } = useApp()
     const navigate = useNavigate()
 
     const handleSubmit = (e) => {

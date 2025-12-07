@@ -1,9 +1,9 @@
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../App'
+import { useApp } from '../context/AppContext'
 
 function Navbar() {
-    const { user, logout } = useAuth()
+    const { user, logout } = useApp()
     const navigate = useNavigate()
 
     const handleLogout = () => {

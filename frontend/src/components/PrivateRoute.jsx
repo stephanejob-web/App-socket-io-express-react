@@ -1,8 +1,8 @@
 import { Navigate } from 'react-router-dom'
-import { useAuth } from '../App'
+import { useApp } from '../context/AppContext'
 
 const PrivateRoute = ({ children }) => {
-    const { token } = useAuth()
+    const { token } = useApp()
 
     if (!token) {
         return <Navigate to="/login" replace />
