@@ -30,7 +30,23 @@ io.on('connection', (socket) => {
             socket.username = username
             usernames.push(username)
             console.log(`👤 Utilisateur ${username} connecté (ID: ${socket.id})`)
-            socket.emit('usernameAccepted', username)
+            socket.emit('usernameAccepted', username, usernames)
+            // À TOUS les autres clients (pour mettre à jour leur liste)
+            socket.broadcast.emit('userJoined', username, usernames)
+
+        }
+    })
+
+    socket.on('sendMessage', (text) => {
+        if (socket.username) {
+            const messageData = {
+                username: socket.username,
+                text: text,
+                timestamp: new Date().toISOString()
+            }
+            console.log(`💬 Message de ${socket.username}: ${text}`)
+            // Envoyer le message à TOUS les clients (y compris l'émetteur)
+            io.emit('message', messageData)
         }
     })
 
@@ -39,9 +55,10 @@ io.on('connection', (socket) => {
         // Retirer le username de la liste
         if (socket.username) {
             usernames = usernames.filter(name => name !== socket.username)
+            // Notifier TOUS les clients de la déconnexion
+            io.emit('userLeft', socket.username, usernames)
         }
     })
-
 })
 
 
